@@ -8,14 +8,14 @@ const userRouter = express.Router()
 
 const signUpSchema = zod.object({
     username: zod.string().email(),
-    password: zod.string().min(8),
+    password: zod.string(),
     firstName: zod.string(),
     lastName: zod.string()
 })
 
 const signInSchema = zod.object({
     username: zod.string().email(),
-    password: zod.string().min(8)
+    password: zod.string()
 })
 
 const updateSchema = zod.object({
@@ -27,17 +27,17 @@ const updateSchema = zod.object({
 userRouter.post("/signup", async (req, res) => {
     const correctSignUpBody = signUpSchema.safeParse(req.body);
     if (!correctSignUpBody.success) {
-        res.status(411).json({
+        return res.status(411).json({
             message: "Email already taken / Incorrect inputs"
         })
     }
-    const userExists = User.findOne({
+    const userExists = await User.findOne({
         username: req.body.username
     });
 
     if (userExists) {
-        res.status(411).json({
-            message: "Email already taken / Incorrect inputs"
+        return res.status(411).json({
+            message: "Email already taken / Incorrect inputs (Different error)"
         })
     } else {
         const user = await User.create({
@@ -47,20 +47,20 @@ userRouter.post("/signup", async (req, res) => {
             lastName: req.body.lastName
         });
 
-        const user_ID = user._id;
+        const userID = user._id;
         
         // Storing some initial amount to the user's account as a perk of signing up for the application
 
         await Account.create({
-            userID: user_ID,
+            userID: userID,
             balance: 1 + Math.random() * 1000
         });
 
         const token = jwt.sign({
-            user_ID
+            userID
         }, JWT_SECRET);
 
-        res.json({
+        return res.json({
             message: "User created successfully",
 	        token: token
         }).status(200)
@@ -104,7 +104,7 @@ userRouter.put("/", authMiddleware, async (req, res) => {
     }
 
     await User.updateOne({
-        _id: req.userId
+        _id: req.userID
     }, req.body);
 
     return res.status(200).json({
