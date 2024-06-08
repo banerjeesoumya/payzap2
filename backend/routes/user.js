@@ -28,7 +28,11 @@ userRouter.post("/signup", async (req, res) => {
     const correctSignUpBody = signUpSchema.safeParse(req.body);
     if (!correctSignUpBody.success) {
         return res.status(411).json({
-            message: "Email already taken / Incorrect inputs"
+            message: "Incorrect inputs" ,
+            details : [
+                    "Usernames should be a valid email address",
+                    "Should have a minimum length of 8"
+            ]
         })
     }
     const userExists = await User.findOne({
@@ -37,7 +41,7 @@ userRouter.post("/signup", async (req, res) => {
 
     if (userExists) {
         return res.status(411).json({
-            message: "Email already taken / Incorrect inputs (Different error)"
+            message: "Username already in use"
         })
     } else {
         const user = await User.create({
@@ -76,12 +80,13 @@ userRouter.post("/signin", async (req, res) => {
     } 
 
     const user = await User.findOne({
-        username: req.body.username
+        username: req.body.username,
+        password: req.body.password
     })
 
     if(!user) {
         return res.json({
-            msg: "Error while logging in"
+            msg: "Error while logging in, invalid credentials..!!"
         }).status(411)
     }
 
@@ -114,7 +119,7 @@ userRouter.put("/", authMiddleware, async (req, res) => {
 })
 
 userRouter.get("/bulk", async (req, res) => {
-    const filter = req.query.filter
+    const filter = req.query.filter || "";
 
     const users = await User.find({
         $or: [{
@@ -128,7 +133,8 @@ userRouter.get("/bulk", async (req, res) => {
         users: users.map((user) => ({
             username: user.username,
             firstName: user.firstName,
-            lastName: user.lastName
+            lastName: user.lastName,
+            _id: user._id
         }))
     })
 })
