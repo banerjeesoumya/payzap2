@@ -6,6 +6,8 @@ export const SendMoney = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const recipientName = searchParams.get("name");
+  
+  console.log(id)
 
   const [amount, setAmount] = useState(0);
   return (
@@ -41,15 +43,16 @@ export const SendMoney = () => {
                   }}
                 />
               </div>
-              <button onClick={() => {
-                axios.post("http://localhost:3003/api/v1/account/transfer", {
-                  to: id,
+              <button onClick={async () => {
+                const response = await axios.post("http://localhost:3003/api/v1/account/transfer", {
+                  recipient: id,
                   amount: amount
                 }, {
                   headers: {
                     Authorization: "Bearer " + localStorage.getItem("SignInToken")
                   }
                 })
+                {console.log(response.data.message)}
               }} className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-500 text-white">
                 Initiate Transfer
               </button>
