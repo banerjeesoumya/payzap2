@@ -27,22 +27,18 @@ const updateSchema = zod.object({
 userRouter.post("/signup", async (req, res) => {
     const correctSignUpBody = signUpSchema.safeParse(req.body);
     if (!correctSignUpBody.success) {
-        return res.status(411).json({
-            message: "Incorrect inputs" ,
-            details : [
-                    "Usernames should be a valid email address",
-                    "Should have a minimum length of 8"
-            ]
-        })
+        return res.json({
+            message: "Incorrect inputs"
+        }).status(411)
     }
     const userExists = await User.findOne({
         username: req.body.username
     });
 
     if (userExists) {
-        return res.status(411).json({
+        return res.json({
             message: "Username already in use"
-        })
+        }).status(411)
     } else {
         const user = await User.create({
             username: req.body.username,
@@ -64,9 +60,17 @@ userRouter.post("/signup", async (req, res) => {
             userID
         }, JWT_SECRET);
 
+        const accdetails = await Account.findOne({
+            userID: userID
+        })
+
+        const balance = accdetails.balance
+
         return res.json({
             message: "User created successfully",
-	        token: token
+	        token: token,
+            name: user.firstName,
+            balance: balance
         }).status(200)
     }
 });
@@ -86,7 +90,7 @@ userRouter.post("/signin", async (req, res) => {
 
     if(!user) {
         return res.json({
-            msg: "Error while logging in, invalid credentials..!!"
+            message: "Error while logging in, invalid credentials..!!"
         }).status(411)
     }
 
@@ -94,8 +98,16 @@ userRouter.post("/signin", async (req, res) => {
         userID: user._id
     }, JWT_SECRET);
 
+    const accdetails = await Account.findOne({
+        userID: user._id
+    })
+
+    const balance = accdetails.balance
+
     res.json({
-        token: token
+        token: token ,
+        name: user.firstName,
+        balance: balance
     }).status(200)
 })
 

@@ -28,9 +28,9 @@ accountsRouter.post("/transfer", authMiddleware, async (req, res) => {
 
     if (!account || account.balance < amount) {
         await currentSession.abortTransaction();
-        return res.status(400).json({
+        return res.json({
             message : "Insufficient balance"
-        })
+        }).status(400)
     }
 
     const recipientAccount = await Account.findOne({
@@ -39,9 +39,9 @@ accountsRouter.post("/transfer", authMiddleware, async (req, res) => {
 
     if (!recipientAccount) {
         await currentSession.abortTransaction();
-        return res.status(400).json({
+        return res.json({
             message : "Invalid Account"
-        })
+        }).status(400)
     }
 
     await Account.updateOne({
@@ -62,9 +62,9 @@ accountsRouter.post("/transfer", authMiddleware, async (req, res) => {
 
     await currentSession.commitTransaction();
 
-    return res.status(200).json({
+    return res.json({
         message : "Transaction succesfull..!!"
-    })
+    }).status(200)
 })
 
 module.exports = accountsRouter;
