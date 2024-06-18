@@ -49,7 +49,6 @@ userRouter.post("/signup", async (req, res) => {
 
         const userID = user._id;
         
-        // Storing some initial amount to the user's account as a perk of signing up for the application
 
         await Account.create({
             userID: userID,
