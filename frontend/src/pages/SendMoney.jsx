@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios"
+import { BACKEND_URL } from "../config";
 
 export const SendMoney = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const recipientName = searchParams.get("name");
+  const navigate = useNavigate();
   
   console.log(id)
 
@@ -44,15 +46,29 @@ export const SendMoney = () => {
                 />
               </div>
               <button onClick={async () => {
-                const response = await axios.post("http://localhost:3003/api/v1/account/transfer", {
+                let token = null;
+                if (localStorage.getItem("SignInToken") !== null) {
+                  token = localStorage.getItem("SignInToken");
+                } else {
+                    token = localStorage.getItem("SignUpToken");
+                }
+                const response = await axios.post(`${BACKEND_URL}/api/v1/account/transfer`, {
                   recipient: id,
                   amount: amount
                 }, {
                   headers: {
-                    Authorization: "Bearer " + localStorage.getItem("SignInToken")
+                    Authorization: `Bearer ${token}`
                   }
                 })
-                {console.log(response.data.message)}
+                console.log(response.status)
+                if (response.status === 200) {
+                  alert(response.data.message)
+                  navigate(`/dashboard?name=${localStorage.getItem("CurrentUser")}`)
+                } 
+                if (response.status === 400) {
+                  alert(response.data.message) 
+                  navigate(`/dashboard?name=${localStorage.getItem("CurrentUser")}`)
+                }
               }} className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-500 text-white">
                 Initiate Transfer
               </button>
