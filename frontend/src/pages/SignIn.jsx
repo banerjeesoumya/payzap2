@@ -25,20 +25,25 @@ export function SignIn() {
     setError("");
 
     localStorage.removeItem("SignInToken" && "SignUpToken");
-    const response = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
         username: username,
         password: password
-    });
+      });
 
-    if (response.data.token) {
-        localStorage.setItem("SignInToken", response.data.token);
-        localStorage.setItem("Balance", response.data.balance)
-        localStorage.setItem("CurrentUser", response.data.name)
-        navigate(`/dashboard?name=${response.data.name}`)
-    } else {
-        setError(response.data.message)
+      if (response.data.token) {
+          localStorage.setItem("SignInToken", response.data.token);
+          localStorage.setItem("Balance", response.data.balance)
+          localStorage.setItem("CurrentUser", response.data.name)
+          navigate(`/dashboard?name=${response.data.name}`)
+      } else {
+          setError(response.data.message)
+      }
+      setLoading(false)
+    } catch (err) {
+        alert(`Make sure all of the inputs are correct`)
+        setLoading(false)
     }
-    setLoading(false)
   };
 
   return (
@@ -50,15 +55,15 @@ export function SignIn() {
       <div className="flex flex-col justify-center">
         <div className="rounded-lg bg-white w-80 text-center p-6 shadow-lg">
           <Heading label={"Sign in"} />
-          <SubHeading label={"Enter your credentials to sign in"} />
+          <SubHeading label={"Enter your registered credentials to sign in"} />
           <InputBox
-            label={"Username"}
-            placeholder={"Enter your username"}
+            label={"Username/Email"}
+            placeholder={"xyz@mail.com"}
             onChange={(e) => setUserName(e.target.value)}
           />
           <InputBox
             label={"Password"}
-            placeholder={"Enter your password"}
+            placeholder={"Minimum 8 characters long"}
             type="password"
             onChange={(e) => setUserPassword(e.target.value)}
           />

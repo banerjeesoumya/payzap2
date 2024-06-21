@@ -27,21 +27,26 @@ export function SignUp() {
         }
 
         localStorage.removeItem("SignUpToken" & "SignInToken") 
-        const response = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
-            firstName: firstName,
-            lastName: lastName,
-            username: username,
-            password: password
-        })
-
-        if (response.data.token) {
-            localStorage.setItem("SignUpToken", response.data.token);
-            localStorage.setItem("Balance", response.data.balance)
-            navigate(`/dashboard?name=${response.data.name}`)
-        } else {
-            setError(response.data.message);
+        try {
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
+                firstName: firstName,
+                lastName: lastName,
+                username: username,
+                password: password
+            })
+    
+            if (response.data.token) {
+                localStorage.setItem("SignUpToken", response.data.token);
+                localStorage.setItem("Balance", response.data.balance)
+                navigate(`/dashboard?name=${response.data.name}`)
+            } else {
+                setError(response.data.message);
+            }
+            setLoading(false)
+        } catch (err) {
+            alert("Make sure all the inputs are correct")
+            setLoading(false)
         }
-        setLoading(false)
     };
 
     return (
@@ -65,14 +70,14 @@ export function SignUp() {
                         onChange={(e) => setLastName(e.target.value)}
                     />
                     <InputBox
-                        label={"Username"}
+                        label={"Username/Email"}
                         placeholder={"xyz@mail.com"}
                         onChange={(e) => setUsername(e.target.value)}
                     />
                     <InputBox
                         label={"Password"}
                         type="password"
-                        placeholder={"Enter your password"}
+                        placeholder={"Minimum 8 characters long"}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
