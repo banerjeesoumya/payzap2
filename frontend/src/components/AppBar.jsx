@@ -1,8 +1,7 @@
-import { useSearchParams } from "react-router-dom";
+
 
 export function AppBar() {
-  const [searchParams] = useSearchParams();
-  const name = searchParams.get("name")
+  const name = localStorage.getItem("CurrentUser")
     return (
       <div className="shadow h-14 flex justify-between items-center bg-white px-4">
         <div className="font-bold text-xl">

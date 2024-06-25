@@ -52,6 +52,10 @@ export const SendMoney = () => {
                 } else {
                     token = localStorage.getItem("SignUpToken");
                 }
+                if (amount < 0) {
+                  alert(`Negative amount not allowed`)
+                  return null
+                }
                 const response = await axios.post(`${BACKEND_URL}/api/v1/account/transfer`, {
                   recipient: id,
                   amount: amount
@@ -60,6 +64,7 @@ export const SendMoney = () => {
                     Authorization: `Bearer ${token}`
                   }
                 })
+                console.log("Control reaching here")
                 console.log(response.status)
                 if (response.status === 200) {
                   alert(response.data.message)
