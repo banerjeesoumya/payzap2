@@ -3,16 +3,15 @@
 import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import axios from "axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../config";
 export const Users = () => {
-  const [searchParams] = useSearchParams();
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const name = searchParams.get("name");
+  const name = localStorage.getItem("CurrentUser")
 
   useEffect(() => {
     const fetchUsers = async () => {
