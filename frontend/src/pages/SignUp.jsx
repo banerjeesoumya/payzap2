@@ -25,7 +25,11 @@ export function SignUp() {
             setError("All fields are required");
             return;
         }
-
+        if (password.length < 8) {
+            setError("All Passwords should be a minimum length of 8 characters");
+            setLoading(false)
+            return;
+        }
         localStorage.removeItem("SignUpToken" & "SignInToken") 
         try {
             const response = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
@@ -38,13 +42,14 @@ export function SignUp() {
             if (response.data.token) {
                 localStorage.setItem("SignUpToken", response.data.token);
                 localStorage.setItem("Balance", response.data.balance)
+                localStorage.setItem("CurrentUser", response.data.name)
                 navigate(`/dashboard?name=${response.data.name}`)
             } else {
                 setError(response.data.message);
             }
             setLoading(false)
         } catch (err) {
-            alert("Make sure all the inputs are correct")
+            alert("Internal Server Error")
             setLoading(false)
         }
     };
