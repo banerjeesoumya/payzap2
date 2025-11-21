@@ -17,7 +17,7 @@ export function Dashboard() {
     if (memory === null) {
       alert("You are not logged into PayZap");
       navigate("/signin");
-    // }
+    }
   }, [memory, navigate]);
 
   if (memory === null) {
